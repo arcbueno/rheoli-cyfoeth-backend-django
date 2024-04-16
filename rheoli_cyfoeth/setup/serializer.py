@@ -8,11 +8,20 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model= Item
         fields = '__all__'
+        
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model= Department
         fields = '__all__'
+        
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model= Employee
         fields = ['id', 'name']
+        
+class DepartmentItemListSerializer(serializers.ModelSerializer):
+    department = serializers.ReadOnlyField(source='department.description')
+    class Meta:
+        model = Item
+        fields = '__all__'
+    
