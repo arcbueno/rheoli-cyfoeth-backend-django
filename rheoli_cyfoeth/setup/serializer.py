@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from setup.models.department import Department
-from setup.models.employee import Employee
 from setup.models.item import Item
+from django.contrib.auth.models import User
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,10 +14,16 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model= Department
         fields = '__all__'
         
-class EmployeeSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model= Employee
-        fields = ['id', 'name']
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff', 'first_name', 'last_name', 'password']
+        write_only_fields = ('password',)
+        read_only_fields = ('id',)
+class GetUserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff', 'first_name', 'last_name']
         
 class DepartmentItemListSerializer(serializers.ModelSerializer):
     department = serializers.ReadOnlyField(source='department.description')

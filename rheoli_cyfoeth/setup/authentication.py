@@ -1,3 +1,4 @@
+from gettext import gettext as _
 from rest_framework import authentication
 
 class BearerAuthentication(authentication.TokenAuthentication):
@@ -7,7 +8,7 @@ class BearerAuthentication(authentication.TokenAuthentication):
     HTTP header, prepended with the string 'Bearer '.  For example:
     Authorization: Bearer 956e252a-513c-48c5-92dd-bfddc364e812
     '''
-    keyword = ['token','bearer']
+    keyword = ['bearer']
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
         if not auth:
