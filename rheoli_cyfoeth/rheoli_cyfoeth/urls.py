@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/users/', UserView.as_view()),
     path('api/users/<int:pk>',UserView.as_view()),
+    path('api/users/<str:pk>',UserView.as_view()),
     path('api/departments/<int:pk>/items',DepartmentItemList.as_view()),
-    path('api/login/', obtain_auth_token, name='api_token_auth'),  
+    path('api/login/', obtain_auth_token, name='login'),  
 ]
