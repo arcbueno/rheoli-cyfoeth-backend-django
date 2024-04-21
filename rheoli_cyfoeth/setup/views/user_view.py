@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from setup.serializer import GetUserSerializer, UserSerializer
+from setup.serializer import GetUserSerializer, UserSerializer, CreateUserSerializer
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
@@ -12,9 +12,8 @@ class UserView(APIView):
     View to list all users in the system.
 
     * Requires token authentication.
-    * Only admin users are able to access this view.
+    * Only admin users has access to delete and get all users.
     """
-    # permission_classes = [permissions.IsAdminUser]
         
     def get_by_id(self, id: int, request: Request) -> Response:
         
@@ -60,12 +59,9 @@ class UserView(APIView):
         if(pk != None and type(pk) == str):
             return self.get_by_username(pk, request=request)
         
-        try:
-            user: User = Token.objects.get(key=request.auth.key).user
-            if(not user.is_staff):
-                return ResponseUtils().return_unauthorized()
-        except Token.DoesNotExist:
-            return ResponseUtils().return_unauthorized()
+        result = self._validate_user(should_be_admin=True, request=request)
+        if(result is not None): 
+            return result
               
         users = [GetUserSerializer(user).data for user in User.objects.all()]
         return Response(users)
@@ -73,8 +69,8 @@ class UserView(APIView):
     '''
     Create a new user
     '''
-    def post(self, request, format=None) -> Response:
-        serialized = UserSerializer(data=request.data)
+    def post(self, request: Request, format=None) -> Response:
+        serialized = CreateUserSerializer(data=request.data)
         if serialized.is_valid():
             User.objects.create_user(
                 serialized.data['username'],
@@ -85,23 +81,52 @@ class UserView(APIView):
                 is_staff=serialized.data['is_staff']
             )
             return Response(serialized.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
         
-    def delete(self, request, pk=None) -> Response:
-        try:
-            user: User = Token.objects.get(key=request.auth.key).user
-            if(not user.is_staff):
-                return ResponseUtils().return_unauthorized()
-        except Token.DoesNotExist:
-            return ResponseUtils().return_unauthorized()
+        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
         
+    '''
+    Update a user
+    '''
+    def put(self, request: Request, pk=None,format=None):
+        result = self._validate_user(request=request)
+        if(result is not None): 
+            return result
+        
+        if(pk is not None and type(pk) is int):
+            user: User = User.objects.get(id=pk)
+            serialized = UserSerializer(user, data=request.data)
+            
+            if serialized.is_valid():            
+                serialized.save()
+                return Response(serialized.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    '''
+    Delete a user
+    '''    
+    def delete(self, request: Request, pk=None) -> Response:
+        result = self._validate_user(should_be_admin=True, request=request)
+        if(result is not None): 
+            return result
         if(pk is None or type(pk) != int):
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'details': 'User Id not found'})
         
         user = User.objects.get(id=pk)
         User.delete(user)
         return Response(status=status.HTTP_204_NO_CONTENT)
-            
+    
+    def _validate_user(self,request: Request, should_be_admin=False) -> Response:
+        """
+        Validate the user's credentials.
+        """
+        try:
+            user: User = Token.objects.get(key=request.auth.key).user
+            if((not user.is_staff) and should_be_admin):
+                return ResponseUtils().return_unauthorized()
+        except Token.DoesNotExist:
+            return ResponseUtils().return_unauthorized()
+        
+        return None
         
             
