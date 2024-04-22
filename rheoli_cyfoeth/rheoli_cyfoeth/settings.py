@@ -37,9 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # thrid party
+    # third party
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     #myapp
     'setup'
 ]
