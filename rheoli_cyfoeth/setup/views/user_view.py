@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
 from setup.utils.response_utils import ResponseUtils
+from setup.utils.validation_utils import ValidationUtils
 
 class UserView(APIView):
     """
@@ -19,11 +20,11 @@ class UserView(APIView):
         
         # Non-admin users are allow to only get its user data
         try:
-            user: User = ResponseUtils().get_user_by_token(request.auth.key)
+            user: User = ResponseUtils.get_user_by_token(request.auth.key)
             if(user.id != id and (not user.is_staff)):
-                return ResponseUtils().return_unauthorized()
+                return ResponseUtils.return_unauthorized()
         except Token.DoesNotExist:
-            return ResponseUtils().return_unauthorized()
+            return ResponseUtils.return_unauthorized()
         
         try:
             return Response(GetUserSerializer(User.objects.get(id=id)).data)
@@ -34,11 +35,11 @@ class UserView(APIView):
         
         # Non-admin users are allow to only get its user data
         try:
-            user: User = ResponseUtils().get_user_by_token(request.auth.key)
+            user: User = ResponseUtils.get_user_by_token(request.auth.key)
             if(user.username != username and (not user.is_staff)):
-                return ResponseUtils().return_unauthorized()
+                return ResponseUtils.return_unauthorized()
         except Token.DoesNotExist:
-            return ResponseUtils().return_unauthorized()
+            return ResponseUtils.return_unauthorized()
         
         try:
             return Response(GetUserSerializer(User.objects.get(username=username)).data)
@@ -59,7 +60,7 @@ class UserView(APIView):
         if(pk != None and type(pk) == str):
             return self.get_by_username(pk, request=request)
         
-        result = self._validate_user(should_be_admin=True, request=request)
+        result = ValidationUtils.user_is_admin(request=request)
         if(result is not None): 
             return result
               
@@ -88,7 +89,7 @@ class UserView(APIView):
     Update a user
     '''
     def put(self, request: Request, pk=None,format=None):
-        result = self._validate_user(request=request)
+        result = ValidationUtils.user_is_admin(request=request)
         if(result is not None): 
             return result
         
@@ -106,7 +107,7 @@ class UserView(APIView):
     Delete a user
     '''    
     def delete(self, request: Request, pk=None) -> Response:
-        result = self._validate_user(should_be_admin=True, request=request)
+        result = ValidationUtils.user_is_admin(request=request)
         if(result is not None): 
             return result
         if(pk is None or type(pk) != int):
@@ -116,17 +117,3 @@ class UserView(APIView):
         User.delete(user)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def _validate_user(self,request: Request, should_be_admin=False) -> Response:
-        """
-        Validate the user's credentials.
-        """
-        try:
-            user: User = Token.objects.get(key=request.auth.key).user
-            if((not user.is_staff) and should_be_admin):
-                return ResponseUtils().return_unauthorized()
-        except Token.DoesNotExist:
-            return ResponseUtils().return_unauthorized()
-        
-        return None
-        
-            

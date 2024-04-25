@@ -8,8 +8,8 @@ class ResponseUtils:
     """
     Utility class for creating responses.
     """
-    def return_unauthorized(self):
+    def return_unauthorized():
        return  Response(exception=True, status=status.HTTP_401_UNAUTHORIZED, data={'detail': 'Your user has no access to this'})
    
-    def get_user_by_token(self, key) -> User:
+    def get_user_by_token(key) -> User:
          return Token.objects.get(key=key).user
