@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
+from setup.authentication import BearerAuthentication
 from setup.views.department_view import DepartmentView
 from setup.views.user_view import  UserView
 from setup.views.item_view import DepartmentItemList, ItemView
@@ -17,15 +18,12 @@ router.register('departments', DepartmentView, basename='Departments')
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Rheoli Cyfoeth API",
       default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
+   authentication_classes=[BearerAuthentication]
 )
 
 urlpatterns = [
