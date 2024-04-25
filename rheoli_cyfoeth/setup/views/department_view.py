@@ -1,8 +1,10 @@
+from typing import Any
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from returns.result import Result, Success, Failure
 
+from setup.controllers.department_controller import DepartmentController
 from setup.models.department import Department
 from setup.serializer import DepartmentSerializer
 
@@ -13,6 +15,9 @@ class DepartmentView(viewsets.ModelViewSet):
     queryset = Department.objects.all();
     serializer_class = DepartmentSerializer
     
+    def __init__(self, **kwargs: Any):
+        self.controller = DepartmentController()
+        
     # Override
     def get_permissions(self):
         """
@@ -29,24 +34,16 @@ class DepartmentView(viewsets.ModelViewSet):
         """
         Delete a department by id.
         """
-        try:
-            if(pk == None): 
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            department = Department.objects.get(id=pk)
-            Department.delete(department)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Department.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
+        result = self.controller.delete(pk)
+        return Response(status=result.unwrap())
+    
+    # Override
     def retrieve(self, request: Request, pk=None) -> Response:
         """
         Get a department by id.
         """
-        try:
-            if(pk == None): 
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            department = Department.objects.filter(id=pk).prefetch_related('manager').first()
-            serialized = DepartmentSerializer(department)
-            return Response(serialized.data,status=status.HTTP_200_OK, )
-        except Department.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        result = self.controller.get_by_id(pk)
+        if(result is Failure):
+            return Response(status=result.unwrap()) 
+        
+        return Response(result.unwrap(), status=status.HTTP_200_OK)
