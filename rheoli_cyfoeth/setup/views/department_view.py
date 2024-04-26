@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from returns.result import Result, Success, Failure
+from returns.pipeline import is_successful
 
 from setup.controllers.department_controller import DepartmentController
 from setup.models.department import Department
@@ -43,7 +44,8 @@ class DepartmentView(viewsets.ModelViewSet):
         Get a department by id.
         """
         result = self.controller.get_by_id(pk)
-        if(result is Failure):
-            return Response(status=result.unwrap()) 
+        if(not is_successful(result)):
+            exception = result.failure()
+            return Response(data=exception.message, status=exception.status_code, exception=True) 
         
         return Response(result.unwrap(), status=status.HTTP_200_OK)
