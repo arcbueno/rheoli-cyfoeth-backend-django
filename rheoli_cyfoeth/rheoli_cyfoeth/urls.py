@@ -4,6 +4,7 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from setup.authentication import BearerAuthentication
 from setup.views.department_view import DepartmentView
+from setup.views.moving_history_view import MovingHistoryView
 from setup.views.user_view import  UserView
 from setup.views.item_view import DepartmentItemList, ItemView
 from rest_framework import permissions
@@ -30,6 +31,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/users/', UserView.as_view()),
+    path('api/move', MovingHistoryView.as_view()),
+    path('api/move/', MovingHistoryView.as_view()),
     path('api/users/<int:pk>',UserView.as_view()),
     path('api/users/<str:pk>',UserView.as_view()),
     path('api/departments/<int:pk>/items',DepartmentItemList.as_view()),

@@ -11,8 +11,6 @@ class ResponseUtils:
     Utility class for creating responses.
     """
     
-    def return_unauthorized():
-       return  Response(exception=True, status=status.HTTP_401_UNAUTHORIZED, data={'detail': 'Your user has no access to this'})
     
     def unauthorized_error_data() -> CustomException:
        return CustomException(status_code=status.HTTP_401_UNAUTHORIZED, message={'detail': 'Your user has no access to this'})
@@ -22,6 +20,9 @@ class ResponseUtils:
     
     def invalid_token_error_data() -> CustomException:
        return CustomException(status_code=status.HTTP_401_UNAUTHORIZED, message={'detail': 'Invalid token'})
+    
+    def invalid_data_error_data(text: str) -> CustomException:
+       return CustomException(status_code=status.HTTP_400_BAD_REQUEST, message={'detail': text})
    
     def get_user_by_token(key) -> User:
          return Token.objects.get(key=key).user

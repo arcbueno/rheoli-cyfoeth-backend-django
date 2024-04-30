@@ -105,7 +105,7 @@ class UserView(APIView):
         Delete a user
         """    
         if(pk is None or type(pk) != int):
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'details': 'User Id not found'})
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'detail': 'User Id not found'})
         
         result: Result[int, CustomException] = self.controller.delete_user(pk, token=request.auth.token)
         if(not is_successful(result)):
