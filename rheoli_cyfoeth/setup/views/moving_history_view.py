@@ -17,7 +17,7 @@ class MovingHistoryView(APIView):
 
     def post(self, request: Request, format=None):
         """
-        Return a list of all users.
+        Move an item to other department
         """
         serialized = CreateMovingHistorySerializer(data=request.data)
         if serialized.is_valid():

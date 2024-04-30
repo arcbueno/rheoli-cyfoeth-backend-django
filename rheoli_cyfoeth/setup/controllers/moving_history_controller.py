@@ -45,7 +45,6 @@ class MovingHistoryController:
     
     def __validate_create(self,data: ReturnDict) -> Tuple | CustomException:
        try:
-         dateformat = '%y-%m-%dT%H:%M:%SZ'
          item = Item.objects.get(id=data['item_id'])
          allmovings = item.moving_history.all()
          conflict = [moving for moving in allmovings if (moving.finish_date == datetime.datetime.fromisoformat(data['finish_date']))]

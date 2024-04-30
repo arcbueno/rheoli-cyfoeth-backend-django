@@ -69,4 +69,10 @@ class ItemSerializer(serializers.ModelSerializer):
         model= Item
         fields = '__all__'
         read_only_fields = ('id', 'moving_history', 'department')
+
+class CreateItemSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= Item
+        fields = ('name', 'description', 'department')
         
