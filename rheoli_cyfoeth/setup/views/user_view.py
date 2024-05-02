@@ -5,11 +5,9 @@ from django.contrib.auth.models import User
 from setup.controllers.user_controller import UserController
 from setup.serializer import GetUserSerializer, UserSerializer, CreateUserSerializer
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
-from setup.utils.response_utils import ResponseUtils
 from setup.utils.validation_utils import ValidationUtils
-from returns.result import Result, Success, Failure
+from returns.result import Result
 from ..utils.models_utils.custom_exception import CustomException
 from returns.pipeline import is_successful
 

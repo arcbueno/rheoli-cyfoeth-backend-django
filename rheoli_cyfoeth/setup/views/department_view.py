@@ -61,5 +61,5 @@ class DepartmentView(viewsets.ModelViewSet):
         if(not is_successful(result)):
             exception = result.failure()
             return Response(data=exception.message, status=exception.status_code, exception=True) 
-        
-        return Response(result.unwrap(), status=status.HTTP_200_OK)
+        department = result.unwrap()
+        return Response(DepartmentSerializer(department).data, status=status.HTTP_200_OK)

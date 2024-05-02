@@ -15,13 +15,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_staff', 'first_name', 'last_name', 'password']
+        fields = ['username', 'email', 'is_staff', 'first_name', 'last_name', 'password']
         write_only_fields = ('password',)
-        read_only_fields = ('id',)
 class GetUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_staff', 'first_name', 'last_name', ]
+        fields = ('id', 'username', 'email', 'is_staff', 'first_name', 'last_name', )
         
 class DepartmentSerializer(serializers.ModelSerializer):
     manager = GetUserSerializer()
